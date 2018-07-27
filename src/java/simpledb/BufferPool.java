@@ -1,7 +1,7 @@
 package simpledb;
 
 import java.io.*;
-
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,6 +26,17 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
 
+    
+    //private final Page[] pagePool;
+    //private final Map<PageId, Integer> pageIdToCachedIndex;
+    //private final Set<Integer> idlePagePoolIndex;
+    
+    //Added by Qinlian Chen
+    private final Page[] pagePool;
+    private final Map<PageId, Integer> pageIdToCachedIndex;
+    private final Set<Integer> idlePagePoolIndex;
+    
+    
     /**
      * Creates a BufferPool that caches up to numPages pages.
      *
@@ -33,6 +44,13 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         // some code goes here
+    	pagePool = new Page[numPages];
+    	pageIdToCachedIndex = new HashMap<>();
+    	idlePagePoolIndex = new HashSet<>();
+    	
+    	for(int i=0; i<numPages; i++) {
+    		idlePagePoolIndex.add(i);
+    	}
     }
     
     public static int getPageSize() {
@@ -67,7 +85,19 @@ public class BufferPool {
     public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
         // some code goes here
-        return null;
+    	Integer idWanted = pageIdToCachedIndex.get(pid);
+    	if(idWanted!=null) {
+    		return pagePool[idWanted];
+    	}
+    	else {
+    		idWanted = idlePagePoolIndex.iterator().next();
+    		idlePagePoolIndex.remove(idWanted);
+    		pageIdToCachedIndex.put(pid, idWanted);
+    		pagePool[idWanted] = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
+    		
+    		return pagePool[idWanted];
+    	}
+    	
     }
 
     /**
