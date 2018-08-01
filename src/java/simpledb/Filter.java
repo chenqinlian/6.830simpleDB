@@ -7,6 +7,10 @@ import java.util.*;
  */
 public class Filter extends Operator {
 
+	private final Predicate predicate;
+	private OpIterator child;
+	private OpIterator[] children;
+	
     private static final long serialVersionUID = 1L;
 
     /**
@@ -20,29 +24,34 @@ public class Filter extends Operator {
      */
     public Filter(Predicate p, OpIterator child) {
         // some code goes here
+    	this.predicate = p;
+    	this.child = child;
     }
 
     public Predicate getPredicate() {
         // some code goes here
-        return null;
+        return this.predicate;
     }
 
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return null;
+        return child.getTupleDesc();
     }
 
     public void open() throws DbException, NoSuchElementException,
             TransactionAbortedException {
         // some code goes here
+    	child.open();
     }
 
     public void close() {
         // some code goes here
+    	child.close();
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
         // some code goes here
+    	child.rewind();
     }
 
     /**
@@ -57,18 +66,26 @@ public class Filter extends Operator {
     protected Tuple fetchNext() throws NoSuchElementException,
             TransactionAbortedException, DbException {
         // some code goes here
-        return null;
+    	while(child.hasNext()) {
+    		Tuple tuple = child.next();
+    		if(predicate.filter(tuple)) {
+    			return tuple;
+    		}
+    		
+    	}
+    	return null;
     }
 
     @Override
     public OpIterator[] getChildren() {
         // some code goes here
-        return null;
+        return this.children;
     }
 
     @Override
     public void setChildren(OpIterator[] children) {
         // some code goes here
+    	this.children = children;
     }
 
 }

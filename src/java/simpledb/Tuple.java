@@ -123,4 +123,16 @@ public class Tuple implements Serializable {
         // some code goes here
     	this.tupleDesc = td;
     }
+
+    /**
+     * Merge tuple1 and tuple2
+     * */
+	public static Tuple merge(Tuple tuple1, Tuple tuple2) {
+		// TODO Auto-generated method stub
+		TupleDesc newTd = TupleDesc.merge(tuple1.getTupleDesc(), tuple2.getTupleDesc());
+		Tuple newTuple = new Tuple(newTd); 
+		System.arraycopy(tuple1.fields, 0, newTuple.fields, 0, tuple1.getTupleDesc().numFields());
+		System.arraycopy(tuple2.fields, 0, newTuple.fields, tuple1.getTupleDesc().numFields(), tuple2.getTupleDesc().numFields());
+		return newTuple;
+	}
 }
