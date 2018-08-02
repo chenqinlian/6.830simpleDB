@@ -76,6 +76,7 @@ public class Join extends Operator {
         // some code goes here
     	child1.open();
     	child2.open();
+    	super.open();
     	this.tuple1 = null;
     	
     }
@@ -84,6 +85,7 @@ public class Join extends Operator {
         // some code goes here
     	child1.close();
     	child2.close();
+    	super.close();
     	this.tuple1 = null;
     	
     }
